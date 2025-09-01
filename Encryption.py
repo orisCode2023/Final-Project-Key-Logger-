@@ -1,35 +1,37 @@
-def decrypt_numbers(encrypted_bytes, key):
-    """
-    מקבלת רשימה של מספרים (בייטים מוצפנים) ומפתח,
-    מחזירה את הטקסט המקורי.
-    """
-    # ממירים את המפתח לבייטים
-    key_bytes = key.encode('utf-8')
+class Crypto:
+    def __init__(self, key: str):
+        self.key_bytes = key.encode('utf-8')
 
-    # מבצעים XOR שוב על כל מספר עם הבייט המתאים מהמפתח
-    decrypted_bytes = [b ^ key_bytes[i % len(key_bytes)] for i, b in enumerate(encrypted_bytes)]
+    def process(self, data):
+        """
+        פונקציה אחת להצפנה ופענוח:
+        - אם data הוא מחרוזת -> מחזירה רשימת מספרים (הצפנה)
+        - אם data הוא רשימת מספרים -> מחזירה מחרוזת (פענוח)
+        """
+        if isinstance(data, str):
+            # הצפנה
+            data_bytes = data.encode('utf-8')
+            result = [b ^ self.key_bytes[i % len(self.key_bytes)] for i, b in enumerate(data_bytes)]
+        elif isinstance(data, list):
+            # פענוח
+            decrypted_bytes = [b ^ self.key_bytes[i % len(self.key_bytes)] for i, b in enumerate(data)]
+            result = bytes(decrypted_bytes).decode('utf-8')
+        else:
+            raise ValueError("Data must be a string (for encryption) or a list of ints (for decryption).")
+        return result
 
-    # ממירים את הרשימה חזרה למחרוזת UTF-8
-    return bytes(decrypted_bytes).decode('utf-8')
 
-
-# ===== שימוש =====
-text = []
-key = "mysecret"
-
-# קודם הצפנה
-def encrypt_numbers(text, key):
-    key_bytes = key.encode('utf-8')
-    text_bytes = text.encode('utf-8')
-    encrypted_bytes = [b ^ key_bytes[i % len(key_bytes)] for i, b in enumerate(text_bytes)]
-    return encrypted_bytes
-
-encrypted_numbers = encrypt_numbers(text, key)
-# הדפסה
-# print("Encrypted numbers:", encrypted_numbers)
-
-# פענוח חזרה
-decrypted_text = decrypt_numbers(encrypted_numbers, key)
-# הדפסה
-# print("Decrypted text:", decrypted_text)
-
+# # ===== דוגמה לשימוש =====
+# if __name__ == "__main__":
+#     key = "mysecret"
+#     text = "Hello World!"
+#
+#     crypto = Crypto(key)
+#
+#     # הצפנה
+#     encrypted = crypto.process(text)
+#     print("Encrypted:", encrypted)
+#
+#     # פענוח
+#     decrypted = crypto.process(encrypted)
+#     print("Decrypted:", decrypted)

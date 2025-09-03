@@ -6,15 +6,15 @@ class IKeyLogger(ABC):
 
 
     @abstractmethod
-    def start_logging(self) -> None:
+    def start_logging(self):
         pass
 
 
     @abstractmethod
-    def stop_logging(self) -> None:
+    def stop_logging(self):
         pass
 
 
     @abstractmethod
-    def get_logged_keys(self) -> List[str]:
+    def get_logged_keys(self):
         pass

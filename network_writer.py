@@ -2,6 +2,7 @@ import requests
 import logging
 from interface_writer import IWriter
 from Encryption import Crypto
+import json 
 
 class NetworkWriter(IWriter):
     def __init__(self, url: str, crypto: Crypto):

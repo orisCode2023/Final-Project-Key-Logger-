@@ -16,7 +16,7 @@ class NetworkWriter(IWriter):
 
             payload = {
                 "machine": machine_name,
-                "data": encrypted_data
+                "data": json.dumps(encrypted_data)
             }
 
             response = requests.post(self.url, json=payload, timeout=10)

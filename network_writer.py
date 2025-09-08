@@ -2,7 +2,7 @@ import requests
 import logging
 from interface_writer import IWriter
 from Encryption import Crypto
-import json 
+import json
 
 class NetworkWriter(IWriter):
     def __init__(self, url: str, crypto: Crypto):
@@ -10,14 +10,11 @@ class NetworkWriter(IWriter):
         self.crypto = crypto
         logging.basicConfig(level=logging.INFO)
 
-    def send_data(self, data: str, machine_name: str) -> None:
+    def send_data(self, encrypted_data: str, machine_name: str) -> None:
         try:
-            # Encryption
-            encrypted_data = self.crypto.process(data)
-
             payload = {
                 "machine": machine_name,
-                "data": json.dumps(encrypted_data)
+                "data": json.dumps(encrypted_data)  # alreading encrypted
             }
 
             response = requests.post(self.url, json=payload, timeout=10)

